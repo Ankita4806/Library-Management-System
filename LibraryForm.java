@@ -194,6 +194,71 @@ updateButton.setForeground(Color.BLACK);
 updateButton.setFocusPainted(false);
 updateButton.setOpaque(true);
 updateButton.setBorderPainted(false);
+
+
+JButton deleteButton = new JButton("Delete Record");
+deleteButton.setBounds(150, 440, 150, 35);
+deleteButton.setBackground(accentColor);
+deleteButton.setForeground(Color.BLACK);
+deleteButton.setFocusPainted(false);
+deleteButton.setOpaque(true);
+deleteButton.setBorderPainted(false);
+frame.add(deleteButton);
+
+deleteButton.addActionListener(e -> {
+    String input = JOptionPane.showInputDialog(
+        frame, "Enter Student ID to delete:"
+    );
+
+    if (input == null || input.trim().isEmpty()) {
+        return;
+    }
+
+    try {
+        int studentId = Integer.parseInt(input.trim());
+
+        int confirm = JOptionPane.showConfirmDialog(
+            frame,
+            "Are you sure you want to delete Student ID: " + studentId + "?",
+            "Confirm Delete",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try (Connection con = getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "DELETE FROM issue_records WHERE student_id = ?")) {
+
+            ps.setInt(1, studentId);
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                JOptionPane.showMessageDialog(
+                    frame, "Record deleted successfully!"
+                );
+            } else {
+                JOptionPane.showMessageDialog(
+                    frame, "No record found with this Student ID."
+                );
+            }
+        }
+
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(
+            frame, "Please enter a valid numeric Student ID."
+        );
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(
+            frame, "Error deleting record: " + ex.getMessage()
+        );
+    }
+});
+
+
+
 updateButton.addActionListener(e -> {
 
     String studentId = JOptionPane.showInputDialog(
